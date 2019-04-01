@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - apt update && apt install -y apt-transport-https curl
+      - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+      - echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+      - apt update && apt install -y kubectl
+      - curl -O https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator
+      - chmod +x aws-iam-authenticator
+      - mv aws-iam-authenticator /usr/local/bin/
+  pre_build:
+    commands:
+      - export COMMIT_SHA=${CODEBUILD_RESOLVED_SOURCE_VERSION} # Commit SHA that triggered this build
+      - echo "Running for ${COMMIT_SHA}"
+      - aws eks update-kubeconfig --name ${CLUSTER_NAME}
+      - aws ecr get-login --region us-west-2 --no-include-email | bash
+  build:
+    commands:
+      - docker build test-deployment-pipeline -t 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
+      - docker push 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
+  post_build:
+    commands:
+      - #kubectl apply -f k8s/*

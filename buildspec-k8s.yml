@@ -18,7 +18,7 @@ phases:
       - aws ecr get-login --region us-west-2 --no-include-email | bash
   build:
     commands:
-      - docker build test-deployment-pipeline -t 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
+      - docker build . -t 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
       - docker push 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
   post_build:
     commands:

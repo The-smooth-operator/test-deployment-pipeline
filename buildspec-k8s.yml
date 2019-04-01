@@ -22,4 +22,5 @@ phases:
       - docker push 320464205386.dkr.ecr.us-west-2.amazonaws.com/template:${COMMIT_SHA}
   post_build:
     commands:
-      - kubectl auth can-i apply pod
+      - kubectl apply -f k8s/
+
